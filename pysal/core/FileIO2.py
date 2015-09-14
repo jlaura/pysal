@@ -1,7 +1,7 @@
 __author__ = "Charles R Schmidt <schmidtc@gmail.com>"
 
 __all__ = ['FileIO']
-import abc
+from abc import ABCMeta, abstractmethod
 import glob
 import imp
 import os.path
@@ -21,22 +21,72 @@ class FileIOBase(object):
     True to issubclass(FileIOBase, SomeImplementedClass).
     """
 
-    __metaclass__ = abc.ABCMeta
+    __metaclass__ = ABCMeta
+    
+    def __init__(self, datapath, mode='r'):
+        self._mode = mode
+        self._datapath = datapath
 
-    @abc.abstractmethod
+    @abstractmethod
     def read(self, *args, **kwargs):
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def close(self, *args, **kwargs):
         return
 
-def dispatch_to_io(input_ds):
+    @property
+    def mode(self):
+        return self._mode
+
+    @property
+    def datapath(self):
+        return self._datapath
+
+
+def dispatch_to_io(datapath, *args, **kwargs):
+    #TODO: I want to pass *args, **kwrgs, dataFormat=None, but this is Py3+    
+    #TODO: This is still inherently fragile.  Can we make it more robust?
     """
     I am going to go functional instead of OO here.
-    """
-    print input_ds
+
     
+    Parameters
+    ----------
+    datapath : str
+               Path to the input dataset
+
+    dataFormat : str
+                 An explicit file suffix to force a driver
+
+    Returns
+    -------
+
+        : object
+          Instance of the File I/O driver
+    """
+    dataFormat = kwargs.pop('dataFormat', None)
+    if dataFormat:
+            ext = dataFormat
+    else:
+        ext = os.path.splitext(datapath)[1]
+        ext = ext.replace('.', '')
+        ext = ext.lower()
+    if ext == 'txt':
+        f = open(datapath, 'r')
+        l1 = f.readline()
+        l2 = f.readline()
+        if ext == 'txt':
+            try:
+                n, k = l1.split(',')
+                n, k = int(n), int(k)
+                fields = l2.split(',')
+                assert len(fields) == k
+                ext = 'geoda_txt'
+            except:
+                ext = 'txt'
+
+    return io_drivers[ext](datapath, *args, **kwargs) 
 
 def find_io_plugins():
     """
@@ -50,15 +100,18 @@ def find_io_plugins():
         #print modulename, p
         imp.load_source(modulename, p)
         
-
 def register_io_plugins():
+    """
+    Register all of the plugins that are IO plugins.  These must
+    be concrete implementations of the abstract FileIOBase class 
+    """
     for p in FileIOBase.__subclasses__():
         for f in p.FORMATS:
             io_drivers[f] = p
 
+#Find plugins and push into the driver dictionary
 find_io_plugins()
 register_io_plugins()
-print io_drivers
 
 '''
 class FileIO_MetaCls(type):
