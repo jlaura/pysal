@@ -37,17 +37,17 @@ Utilities
 `fileio`_
     Tool for file input and output, supports many well known file formats
 """
+import config
 import pysal.cg
-import pysal.core
 
 from pysal.version import version
 #from pysal.version import stable_release_date
 #import urllib2, json
-#import config
 #import datetime
 #import os, sys
 
 # toplevel imports to be explicit
+from pysal.core.util.weight_converter import weight_convert
 from pysal.esda.moran import Moran, Moran_BV, Moran_BV_matrix, Moran_Local, Moran_Local_BV
 from pysal.esda.geary import Geary
 from pysal.esda.join_counts import Join_Counts
@@ -79,16 +79,19 @@ from pysal.weights.user import queen_from_shapefile, rook_from_shapefile, \
     threshold_continuousW_from_shapefile, kernelW, kernelW_from_shapefile,\
     adaptive_kernelW, adaptive_kernelW_from_shapefile,\
     min_threshold_dist_from_shapefile, build_lattice_shapefile
-from pysal.core.util.weight_converter import weight_convert
 import pysal.spreg
 import pysal.examples
 from pysal.network.network import Network, NetworkG, NetworkK, NetworkF
 
 
-# Load the IOHandlers
-from pysal.core import IOHandlers
+import pysal.core
 # Assign pysal.open to dispatcher
-open = pysal.core.FileIO.FileIO
+if config.fileio == 'legacy':
+    # Load the IOHandlers
+    from pysal.core import IOHandlers
+    open = pysal.core.FileIO.FileIO
+elif config.fileio == 'new':
+    open = pysal.core.FileIO2.dispatch_to_io
 
 #__all__=[]
 #import esda,weights

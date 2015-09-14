@@ -3,14 +3,64 @@ __author__ = "Charles R Schmidt <schmidtc@gmail.com>"
 __all__ = ['FileIO']
 import abc
 import glob
+import imp
 import os.path
 import struct
 from warnings import warn
 
 import pysal
 
+io_drivers = {}
 
+class FileIOBase(object):
+    """
+    The base class that defines the interface that all subclasses
+    must adhere to.  
+    
+    By subclassing this class, the implementations are registered and report
+    True to issubclass(FileIOBase, SomeImplementedClass).
+    """
 
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def read(self, *args, **kwargs):
+        return
+
+    @abc.abstractmethod
+    def close(self, *args, **kwargs):
+        return
+
+def dispatch_to_io(input_ds):
+    """
+    I am going to go functional instead of OO here.
+    """
+    print input_ds
+    
+
+def find_io_plugins():
+    """
+    Glob the IO directory, and grab all the .py files.
+    """
+    iohandlers = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                              'IOPlugins')
+    pluginfiles = glob.glob('{}/*.py'.format(iohandlers))
+    for p in pluginfiles:
+        modulename, _ = os.path.splitext(os.path.basename(p))
+        #print modulename, p
+        imp.load_source(modulename, p)
+        
+
+def register_io_plugins():
+    for p in FileIOBase.__subclasses__():
+        for f in p.FORMATS:
+            io_drivers[f] = p
+
+find_io_plugins()
+register_io_plugins()
+print io_drivers
+
+'''
 class FileIO_MetaCls(type):
     """
     This Meta Class is instantiated when the class is first defined.
@@ -338,3 +388,4 @@ class FileIO(object):  # should be a type?
     def flush(self):
         self._complain_ifclosed(self.closed)
         raise NotImplementedError
+    '''

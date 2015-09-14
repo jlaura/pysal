@@ -1,4 +1,4 @@
-import pysal.core.FileIO as FileIO
+from pysal.core.FileIO2 import FileIOBase
 from geomet import wkb
 from sqlalchemy.ext.automap import automap_base
 
@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 
-class SQLConnection(FileIO.FileIO):
+class SQLConnection(FileIOBase):
     """
     Reads SQL mappable
     """
