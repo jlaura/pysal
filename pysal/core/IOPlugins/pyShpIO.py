@@ -11,6 +11,7 @@ __all__ = ['PurePyShpWrapper']
 from pysal.core.FileIO2 import FileIOBase  # as FileIO
 from pysal.core.util import shp_file
 import pysal.cg as cg
+from pysal.core.geodf import GeoSeries  #Should be in the ps namespace
 from warnings import warn
 import unittest
 
@@ -78,7 +79,6 @@ class PurePyShpWrapper(FileIOBase):
     @pos.setter
     def pos(self, value):
         self._pos = value
-        print self._pos
 
     def __len__(self):
         if self.dataObj:
@@ -155,7 +155,6 @@ class PurePyShpWrapper(FileIOBase):
         except IndexError:
             return None
         self.pos += 1
-        print self.pos
         if self.dataObj.type() == 'POINT':
             shp = self.type((rec['X'], rec['Y']))
         elif self.dataObj.type() == 'POINTZ':
@@ -203,15 +202,17 @@ class PurePyShpWrapper(FileIOBase):
         If n = 0 read none
         If n > 0 read n entries
         """
+        #TODO: I do not want a result as a list, I want a dataframe.
         result = []
         if n < 0:
+            #Treating as an iterator was slick, but why?
             while 1:
                 res = self._read()
                 if res:
                     result.append(res)
                 else:
                     break
-            self.pos = 0
+            self.pos = 0  #Must reset pos 
             return result
         elif n == 0:
             return None
