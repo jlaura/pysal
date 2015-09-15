@@ -214,8 +214,7 @@ class PurePyShpWrapper(FileIOBase):
                 else:
                     break
             self.pos = 0  #Must reset pos
-            geoms = [i.__geo_interface__ for i in result]
-            return GeoSeries(geoms)
+            return GeoSeries(result)
         
         elif n == 0:
             return None
@@ -226,8 +225,7 @@ class PurePyShpWrapper(FileIOBase):
                     result.append(self._read())
                 except StopIteration:
                     break
-            geoms = [i.__geo_interface__ for i in result]
-            return GeoSeries(geoms)
+            return GeoSeries(result)
     
     def close(self):
         self.dataObj.close()

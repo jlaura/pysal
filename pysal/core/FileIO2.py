@@ -112,6 +112,7 @@ def register_io_plugins():
 #Find plugins and push into the driver dictionary
 find_io_plugins()
 register_io_plugins()
+print io_drivers
 
 '''
 class FileIO_MetaCls(type):

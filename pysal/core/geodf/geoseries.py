@@ -81,12 +81,14 @@ class GeoSeries(GeoDfBase, Series):
         self._invalidate_sindex()
 
     def append(self, *args, **kwargs):
+        #TODO: This is not a unique index, but should be so we can use as IDs
         return self._wrapped_pandas_method('append', *args, **kwargs)
 
     @property
     def geometry(self):
         return self
-
+    
+    '''
     @classmethod
     def from_file(cls, filename, **kwargs):
         """
@@ -111,6 +113,7 @@ class GeoSeries(GeoDfBase, Series):
         g = GeoSeries(geoms)
         g.crs = crs
         return g
+    '''
 
     @property
     def __geo_interface__(self):
