@@ -174,8 +174,8 @@ class GeoDataFrame(GeoDfBase, DataFrame):
                 f = f.__geo_interface__
             else:
                 f = f
-
-            d = {'geometry': shape(f['geometry']) if f['geometry'] else None}
+            print f
+            d = {'geometry': shape(f['coordinates']) if f['coordinates'] else None}
             d.update(f['properties'])
             rows.append(d)
         df = GeoDataFrame.from_dict(rows)

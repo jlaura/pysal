@@ -11,7 +11,8 @@ __all__ = ['PurePyShpWrapper']
 from pysal.core.FileIO2 import FileIOBase  # as FileIO
 from pysal.core.util import shp_file
 import pysal.cg as cg
-from pysal.core.geodf import GeoSeries  #Should be in the ps namespace
+from pysal.core.geodf.geoseries import GeoSeries
+
 from warnings import warn
 import unittest
 
@@ -212,8 +213,10 @@ class PurePyShpWrapper(FileIOBase):
                     result.append(res)
                 else:
                     break
-            self.pos = 0  #Must reset pos 
-            return result
+            self.pos = 0  #Must reset pos
+            geoms = [i.__geo_interface__ for i in result]
+            return GeoSeries(geoms)
+        
         elif n == 0:
             return None
         else:
@@ -223,8 +226,8 @@ class PurePyShpWrapper(FileIOBase):
                     result.append(self._read())
                 except StopIteration:
                     break
-            return result
-
+            geoms = [i.__geo_interface__ for i in result]
+            return GeoSeries(geoms)
     
     def close(self):
         self.dataObj.close()

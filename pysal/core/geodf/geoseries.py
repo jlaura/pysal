@@ -22,10 +22,12 @@ def _is_empty(x):
     except:
         return False
 
+'''
 def _convert_array_args(args):
     if len(args) == 1 and isinstance(args[0], BaseGeometry):
         args = ([args[0]],)
     return args
+'''
 
 class _CoordinateIndexer(_NDFrameIndexer):
     """ Indexing by coordinate slices """
@@ -55,19 +57,23 @@ class GeoSeries(GeoDfBase, Series):
 
     def __new__(cls, *args, **kwargs):
         kwargs.pop('crs', None)
+        '''
         if OLD_PANDAS:
             args = _convert_array_args(args)
             arr = Series.__new__(cls, *args, **kwargs)
         else:
-            arr = Series.__new__(cls)
+        '''
+        arr = Series.__new__(cls)
         if type(arr) is GeoSeries:
             return arr
         else:
             return arr.view(GeoSeries)
 
     def __init__(self, *args, **kwargs):
+        '''
         if not OLD_PANDAS:
             args = _convert_array_args(args)
+        '''
         crs = kwargs.pop('crs', None)
 
         super(GeoSeries, self).__init__(*args, **kwargs)
