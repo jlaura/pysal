@@ -83,7 +83,6 @@ import pysal.spreg
 import pysal.examples
 from pysal.network.network import Network, NetworkG, NetworkK, NetworkF
 
-
 import pysal.core
 # Assign pysal.open to dispatcher
 if config.fileio == 'legacy':

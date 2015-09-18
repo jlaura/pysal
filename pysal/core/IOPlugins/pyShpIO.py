@@ -203,7 +203,7 @@ class PurePyShpWrapper(FileIOBase):
         If n = 0 read none
         If n > 0 read n entries
         """
-        #TODO: I do not want a result as a list, I want a dataframe.
+        #TODO: Our geometry objects need slots defined if we wants lots of them.
         result = []
         if n < 0:
             #Treating as an iterator was slick, but why?

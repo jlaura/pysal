@@ -1,11 +1,12 @@
 __all__ = ['DataTable']
-import FileIO
+from FileIO2 import FileIOBase
 import numpy as np
 
 __author__ = "Charles R Schmidt <schmidtc@gmail.com>"
 
 
-class DataTable(FileIO.FileIO):
+#Here I am modifying DataTable to *not* subclass FileIO.FileIO
+class DataTable(FileIOBase):
     """ DataTable provides additional functionality to FileIO for data table file tables
         FileIO Handlers that provide data tables should subclass this instead of FileIO """
     class _By_Col:
@@ -25,7 +26,9 @@ class DataTable(FileIO.FileIO):
             return self.p._get_col(key)
 
     def __init__(self, *args, **kwargs):
-        FileIO.FileIO.__init__(self, *args, **kwargs)
+        #TODO: Should the data table really inherit from FileIOBase?
+        super(DataTable, self).__init__(*args, **kwargs)
+        #FileIO.FileIO.__init__(self, *args, **kwargs)
 
     def __repr__(self):
         return 'DataTable: % s' % self.dataPath

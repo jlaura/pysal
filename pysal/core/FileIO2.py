@@ -106,8 +106,10 @@ def register_io_plugins():
     be concrete implementations of the abstract FileIOBase class 
     """
     for p in FileIOBase.__subclasses__():
-        for f in p.FORMATS:
-            io_drivers[f] = p
+        #TODO: Tables is a support class, how is that rectified?
+        if hasattr(p, 'FORMATS'):
+            for f in p.FORMATS:
+                io_drivers[f] = p
 
 #Find plugins and push into the driver dictionary
 find_io_plugins()

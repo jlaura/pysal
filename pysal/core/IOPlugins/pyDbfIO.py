@@ -1,4 +1,5 @@
 from pysal.core import Tables
+from pysal.core.FileIO2 import FileIOBase
 import datetime
 import struct
 import itertools
@@ -9,7 +10,8 @@ __author__ = "Charles R Schmidt <schmidtc@gmail.com>"
 __all__ = ['DBF']
 
 
-class DBF(Tables.DataTable):
+class DBF(Tables.DataTable, FileIOBase):
+
     """
     PySAL DBF Reader/Writer
 
@@ -51,9 +53,10 @@ class DBF(Tables.DataTable):
         dataPath -- str -- Path to file, including file.
         mode -- str -- 'r' or 'w'
         """
-        pysal.core.Tables.DataTable.__init__(self, *args, **kwargs)
+        super(DBF, self).__init__(*args, **kwargs)
+        #pysal.core.Tables.DataTable.__init__(self, *args, **kwargs)
         if self.mode == 'r':
-            self.f = f = open(self.dataPath, 'rb')
+            self.f = f = open(self.datapath, 'rb')
             numrec, lenheader = struct.unpack('<xxxxLH22x', f.read(32))
             numfields = (lenheader - 33) // 32
             self.n_records = numrec
@@ -87,7 +90,7 @@ class DBF(Tables.DataTable):
 
             #self.spec = [types[fInfo[0]] for fInfo in self.field_info]
         elif self.mode == 'w':
-            self.f = open(self.dataPath, 'wb')
+            self.f = open(self.datapath, 'wb')
             self.header = None
             self.field_spec = None
             self.numrec = 0
@@ -103,6 +106,7 @@ class DBF(Tables.DataTable):
         self.pos = i
 
     def _get_col(self, key):
+        #TODO: pysal.MISSINGVALUE should probably be pysal.config.MISSINGVALUE
         """return the column vector"""
         if key not in self._col_index:
             raise AttributeError('Field: % s does not exist in header' % key)
@@ -195,6 +199,35 @@ class DBF(Tables.DataTable):
                 value = value.rstrip()
             result.append(value)
         return result
+
+    def read(self, n=-1):
+        result = []
+        if n < 0:
+            #Treating as an iterator was slick, but why?
+            while 1:
+                res = self.read_record()
+                if res:
+                    result.append(res)
+                else:
+                    break
+            self.pos = 0  #Must reset pos
+            print result
+            #return GeoSeries(result)
+        elif n == 0:
+            return None
+        else:
+            result = []
+            for i in range(0,n):
+                try:
+                    result.append(self._read())
+                except StopIteration:
+                    break
+            print result
+            #return GeoSeries(result)
+
+
+    def read_by_column(self, n=-1):
+        raise NotImplementedError
 
     def _read(self):
         if self.mode != 'r':
